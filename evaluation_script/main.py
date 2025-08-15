@@ -1,81 +1,59 @@
-import random
+# evaluation_script/main.py
+import json
+from typing import Dict
 
+# Difficulty weights
+W = {"easy": 0.25, "medium": 0.35, "hard": 0.40}
+
+DISPLAY_NAMES = {
+    "pesq": "PESQ",
+    "estoi": "ESTOI",
+    "dnsmos": "DNSMOS",
+    "mfcc_cs": "MFCC-CS",
+}
+
+def _weighted_metric(d: Dict[str, Dict[str, float]], key: str) -> float:
+    """Weighted avg across difficulties for a given metric key."""
+    return (
+        float(d["easy"][key])   * W["easy"]
+        + float(d["medium"][key]) * W["medium"]
+        + float(d["hard"][key])   * W["hard"]
+    )
 
 def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwargs):
-    print("Starting Evaluation.....")
     """
-    Evaluates the submission for a particular challenge phase and returns score
-    Arguments:
-
-        `test_annotations_file`: Path to test_annotation_file on the server
-        `user_submission_file`: Path to file submitted by the user
-        `phase_codename`: Phase to which submission is made
-
-        `**kwargs`: keyword arguments that contains additional submission
-        metadata that challenge hosts can use to send slack notification.
-        You can access the submission metadata
-        with kwargs['submission_metadata']
-
-        Example: A sample submission metadata can be accessed like this:
-        >>> print(kwargs['submission_metadata'])
-        {
-            'status': u'running',
-            'when_made_public': None,
-            'participant_team': 5,
-            'input_file': 'https://abc.xyz/path/to/submission/file.json',
-            'execution_time': u'123',
-            'publication_url': u'ABC',
-            'challenge_phase': 1,
-            'created_by': u'ABC',
-            'stdout_file': 'https://abc.xyz/path/to/stdout/file.json',
-            'method_name': u'Test',
-            'stderr_file': 'https://abc.xyz/path/to/stderr/file.json',
-            'participant_team_name': u'Test Team',
-            'project_url': u'http://foo.bar',
-            'method_description': u'ABC',
-            'is_public': False,
-            'submission_result_file': 'https://abc.xyz/path/result/file.json',
-            'id': 123,
-            'submitted_at': u'2017-03-20T19:22:03.880652Z'
-        }
+    EvalAI entrypoint. We expect `user_submission_file` to be a JSON file
+    containing:
+      { "easy": {...}, "medium": {...}, "hard": {...} }
+    where each sub-dict has keys: pesq, estoi, dnsmos, mfcc_cs.
     """
-    output = {}
-    if phase_codename == "dev":
-        print("Evaluating for Dev Phase")
-        output["result"] = [
-            {
-                "train_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
-                }
-            }
-        ]
-        # To display the results in the result file
-        output["submission_result"] = output["result"][0]["train_split"]
-        print("Completed evaluation for Dev Phase")
-    elif phase_codename == "test":
-        print("Evaluating for Test Phase")
-        output["result"] = [
-            {
-                "train_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
-                }
-            },
-            {
-                "test_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
-                }
-            },
-        ]
-        # To display the results in the result file
-        output["submission_result"] = output["result"][0]
-        print("Completed evaluation for Test Phase")
-    return output
+    with open(user_submission_file, "r", encoding="utf-8") as f:
+        metrics = json.load(f)
+
+    # compute difficulty-weighted metrics
+    pesq   = _weighted_metric(metrics, "pesq")
+    estoi  = _weighted_metric(metrics, "estoi")
+    dnsmos = _weighted_metric(metrics, "dnsmos")
+    mfcc   = _weighted_metric(metrics, "mfcc_cs")
+
+    # Total can be any rule you like; here we use the mean of the four
+    total  = (pesq + estoi + dnsmos + mfcc) / 4.0
+
+    # Leaderboard split name must match your challenge_config dataset split codename
+    split_name = "test_split" if phase_codename == "test" else "train_split"
+
+    split_payload = {
+        "PESQ":   round(pesq, 4),
+        "ESTOI":  round(estoi, 4),
+        "DNSMOS": round(dnsmos, 4),
+        "MFCC-CS": round(mfcc, 4),
+        "Total":  round(total, 4),
+    }
+
+    result_list = [{split_name: split_payload}]
+
+    return {
+        "result": result_list,
+        # also show in the submission result file
+        "submission_result": result_list[0],
+    }
