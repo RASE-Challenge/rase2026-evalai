@@ -30,25 +30,20 @@ tags:
 # Leaderboard definition
 # ---------------------
 leaderboard:
-  - id: rase_board
+  - id: 1
     schema:
-      labels: ["PESQ", "ESTOI", "DNSMOS", "MFCC_Cosine", "Final"]
-      default_order_by: "Final"
-      metadata:
-        PESQ:
-          sort_ascending: false   # higher is better
-          description: "Perceptual Evaluation of Speech Quality."
-        ESTOI:
-          sort_ascending: false   # higher is better
-          description: "Extended Short-Time Objective Intelligibility."
-        DNSMOS:
-          sort_ascending: false   # higher is better
-          description: "Deep Noise Suppression MOS."
-        MFCC_Cosine:
-          sort_ascending: false   # higher is better
-          description: "Cosine similarity in MFCC domain."
-        Final:
-          sort_ascending: false   # higher is better (our composite)
+      {
+        "labels": ["PESQ", "ESTOI", "DNSMOS", "MFCC-CS", "Total"],
+        "default_order_by": "Total",
+        "metadata": {
+          "PESQ":     { "sort_ascending": false, "description": "Perceptual Evaluation of Speech Quality (weighted across difficulties)." },
+          "ESTOI":    { "sort_ascending": false, "description": "Extended STOI (weighted)." },
+          "DNSMOS":   { "sort_ascending": false, "description": "DNSMOS (weighted)." },
+          "MFCC-CS":  { "sort_ascending": false, "description": "MFCC cosine similarity (weighted)." },
+          "Total":    { "sort_ascending": false, "description": "Aggregate of the four weighted metrics." }
+        }
+      }
+
 
 # ---------------------
 # Dataset split(s)
@@ -125,3 +120,4 @@ challenge_phase_splits:
     is_leaderboard_order_descending: true
     show_execution_time: true
     show_leaderboard_by_latest_submission: true
+
