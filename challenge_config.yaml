@@ -66,6 +66,38 @@ dataset_splits:
 # Phases (single-phase)
 # ---------------------
 challenge_phases:
+     - id: 0
+    name: "Sanity Check"
+    description: templates/challenge_phase_0_description.html
+    leaderboard_public: true
+    is_public: true
+    challenge: 1
+    is_active: true
+
+    is_docker_based: false
+
+    max_concurrent_submissions_allowed: 2
+    max_submissions_per_day: 10
+    max_submissions_per_month: 100
+    max_submissions: 999
+
+    allowed_email_ids: []
+    disable_logs: false
+    is_submission_public: false
+
+    start_date: "2025-09-07 00:00:00"
+    end_date:   "2026-02-10 23:59:59"
+
+    test_annotation_file: annotations/test_annotations_devsplit.json
+    codename: "sanity_phase"
+
+    default_submission_meta_attributes:
+      - name: method_name
+        is_visible: true
+
+    allowed_submission_file_types: ".json, .txt"
+
+
   - id: 1
     name: "Main Phase"
     description: templates/challenge_phase_1_description.html   # must exist
@@ -115,6 +147,15 @@ challenge_phases:
 # Phase ↔ Split ↔ Leaderboard
 # -------------------------
 challenge_phase_splits:
+  - challenge_phase_id: 0
+    leaderboard_id: 1
+    dataset_split_id: 1
+    visibility: 3
+    leaderboard_decimal_precision: 3
+    is_leaderboard_order_descending: true
+    show_execution_time: true
+    show_leaderboard_by_latest_submission: true
+
   - challenge_phase_id: 1
     leaderboard_id: 1
     dataset_split_id: 1
@@ -123,4 +164,5 @@ challenge_phase_splits:
     is_leaderboard_order_descending: true
     show_execution_time: true
     show_leaderboard_by_latest_submission: true
+
 
