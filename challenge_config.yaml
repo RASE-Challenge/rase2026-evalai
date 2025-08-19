@@ -19,7 +19,7 @@ evaluation_script: evaluation_script.zip
 remote_evaluation: true
 
 # Challenge visibility timeframe (UTC)
-start_date: "2025-09-07 00:00:00"
+start_date: "2025-08-18 00:00:00"
 end_date:   "2026-02-10 23:59:59"
 
 published: true
@@ -87,7 +87,7 @@ challenge_phases:
     disable_logs: false
     is_submission_public: false
 
-    start_date: "2025-09-07 00:00:00"
+    start_date: "2025-08-18 00:00:00"
     end_date:   "2026-02-10 23:59:59"
 
     # Annotation file must exist in the bundle
@@ -123,6 +123,7 @@ challenge_phase_splits:
     is_leaderboard_order_descending: true
     show_execution_time: true
     show_leaderboard_by_latest_submission: true
+
 
 
 
