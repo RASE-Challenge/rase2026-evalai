@@ -68,7 +68,7 @@ dataset_splits:
 challenge_phases:
   - id: 1
     name: "Main Phase"
-    description: templates/challenge_phase_main.html   # must exist
+    description: templates/challenge_phase_1_description.html   # must exist
     leaderboard_public: true
     is_public: true
     challenge: 1
@@ -91,7 +91,7 @@ challenge_phases:
     end_date:   "2026-02-10 23:59:59"
 
     # Annotation file must exist in the bundle
-    test_annotation_file: annotations/test.json
+    test_annotation_file: annotations/test_annotations_devsplit.json
 
     # This must match what your evaluation script expects
     codename: "main_phase"
@@ -123,3 +123,4 @@ challenge_phase_splits:
     is_leaderboard_order_descending: true
     show_execution_time: true
     show_leaderboard_by_latest_submission: true
+
